@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>管理页面 | 163 music</title>
+    <!-- <script src="../node_modules/leancloud-storage/dist/av-min.js"></script> -->
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    .upload-wrapper {
+      margin: 10px;
+      padding: 50px 10px;
+      border: 2px dashed #000;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .upload-wrapper > .upload-preview {
+      width: 100%;
+    }
+    .upload-wrapper > .upload-preview > span {
+      display: inline-block;
+      margin: 1px 1px;
+      padding: 0 4px;
+      background-color: #c1d6f5;
+      border-radius: 5px;
+    }
+    .upload-wrapper > input {
+      margin: 10px 0;
+    }
+    .upload-wrapper > p {
+      color: red;
+    }
+  </style>
+  <body>
+    <div id="uploadBox" class="upload-wrapper">
+      <div id="filePreview" class="upload-preview"></div>
+      <input type="button" id="uploadButton" value="上传全部" />
+      <p id="uploadMessage">拖曳上传，文件大小限制 30MB</p>
+    </div>
+  </body>
+</html>
