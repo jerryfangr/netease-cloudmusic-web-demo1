@@ -116,18 +116,7 @@ let controller = {
     return array[array.length - 1];
   },
   appendView(element, file) {
-    let allowed_image_type = ["jpg", "png", "gif"];
-    //创建一个url连接,供src属性引用 实现预览功能
-    let fileLink = window.URL.createObjectURL(file);
-    let fileInfo = "no file";
-    // 视频同理 <video width='10px' height='10px' controls='controls' src=''></video>
-    if (allowed_image_type.indexOf(file.fileType) !== -1) {//如果是图片
-      file.fileType = "image/" + file.fileType;
-      fileInfo = "<img width='100px' src='" + fileLink + "'>";
-    } else { //其他格式，只显示文件名
-      file.fileType = "unknow";
-      fileInfo = "<span>" + file.name + '</span>';
-    }
+    let fileInfo = "<span>" + file.name + '</span>';
     element.insertAdjacentHTML('beforeend', fileInfo);
   }
 }
