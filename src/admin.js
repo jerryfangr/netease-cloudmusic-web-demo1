@@ -1,3 +1,4 @@
+import './admin.less'
 import axios from 'axios';
 // 文件拖动上传实现
 let uploadFile = null;
@@ -34,7 +35,6 @@ let model = {
     return this.axios.get('/token');
   },
   upload (uploadFiles) {
-    console.log(uploadFiles);
     //新建一个FormData对象，加文件数据
     var formData = new FormData(); 
     for (const key in uploadFiles) {
@@ -65,7 +65,7 @@ model.init();
 
 let controller = {
   view: null,
-  uploadFiles: {},
+  uploadFiles: null,
   init(view, model) {
     this.view = view;
     this.model = model;
@@ -80,16 +80,15 @@ let controller = {
       if (files.length == 0) { //检测是否是拖拽文件到页面的操作
         return false;
       }
-
+      this.uploadFiles = this.uploadFiles || {};
       for (let i = 0; i < files.length; i++) {
         let file = files[i];
-        console.log(file.name);
         if (this.uploadFiles[file.name] !== undefined) {
           this.messageView.textContent = "[" + file.name + "]，已存在";
           return;
         }
         file.fileType = this.getFileType(file.name);
-        this.appendView(this.previewView, file)
+        this.appendView(this.previewView, file.name)
         this.uploadFiles[file.name] = file;
       }
 
@@ -97,16 +96,44 @@ let controller = {
     });
 
     this.uploadView.addEventListener('click', e => {
+      if (this.uploadFiles === null) {
+        return this.setStatus('unchoose')
+      }
+
       this.model.upload(this.uploadFiles)
         .then((res) => {
-          console.log(res.request.responseText);
-          this.messageView.textContent = "上传完毕!"
-          this.previewView.innerHTML = "";
-          this.uploadFiles = {};
+          let result = JSON.parse(res.request.responseText).result;
+          let fileLinks = result.urls;
+          for (const key in fileLinks) { // 转化为真正的网页链接编码
+            fileLinks[key] = encodeURI(fileLinks[key]);
+          }
+          console.log(fileLinks);
+          this.setStatus('finish')
         }, error => {
           console.log([error]);
         })
     });
+  },
+  setStatus (status) {
+    switch (status) {
+      case 'finish':
+        this.messageView.textContent = "上传完毕!"
+        break;
+      case 'reset':
+        this.messageView.textContent = "拖曳上传，单次总和大小限制 50MB"
+        break;
+      case 'error':
+        this.messageView.textContent = "上传失败"
+        break;
+      case 'unchoose':
+        this.messageView.textContent = "未选择文件"
+        break;
+      default:
+        this.messageView.textContent = "未知错误"
+        break;
+    }
+    this.previewView.innerHTML = "";
+    this.uploadFiles = null;
   },
   getFileType(filename) {
     let array = filename.split(".");
@@ -115,8 +142,8 @@ let controller = {
     }
     return array[array.length - 1];
   },
-  appendView(element, file) {
-    let fileInfo = "<span>" + file.name + '</span>';
+  appendView(element, info) {
+    let fileInfo = "<span>" + info + '</span>';
     element.insertAdjacentHTML('beforeend', fileInfo);
   }
 }
