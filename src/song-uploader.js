@@ -1,4 +1,5 @@
 import axios from 'axios';
+import eventHub from './event-hub';
 
 let view = {
   el: '.page > aside > .upload-area',
@@ -23,7 +24,7 @@ let model = {
     this.updateToken();
     this.update && this.update();
   },
-  updateToken() {
+  updateToken () {
     this.axios.get('/token')
       .then(res => {
         let data = JSON.parse(res.request.responseText);
@@ -49,7 +50,7 @@ let model = {
   update() {
     setInterval(() => {
       this.updateToken();
-    }, 5 * 60 * 1000)
+    }, 1 * 60 * 1000)
   }
 }
 
@@ -94,7 +95,7 @@ let controller = {
       if (this.uploadFiles === null) {
         return this.setStatus('unchoose')
       }
-      this.uploadFiles();
+      this.uploadFileToServer();
     });
   },
   stopDefaultDrop () {
@@ -104,18 +105,22 @@ let controller = {
     this.stopDefault(document, "dragenter"); //拖进
     this.stopDefault(document, "dragover"); //拖来拖去
   },
-  uploadFiles () {
+  uploadFileToServer () {
     return this.model.upload(this.uploadFiles)
       .then((res) => {
         let result = JSON.parse(res.request.responseText).result;
-        let fileLinks = result.urls;
-        for (const key in fileLinks) { // 转化为真正的网页链接编码
-          fileLinks[key] = encodeURI(fileLinks[key]);
+        let fileLinks = [];
+        for (const key in result.urls) { // 转化为真正的网页链接编码
+          fileLinks.push({
+            key: key,
+            link: encodeURI(result.urls[key])
+          })
         }
-        console.log(fileLinks);
+        eventHub.emit('upload', fileLinks);
         this.setStatus('finish')
       }, error => {
         console.log([error]);
+          this.setStatus('error')
       });
   },
   setStatus(status) {

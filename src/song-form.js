@@ -1,27 +1,26 @@
+import eventHub from './event-hub';
+
 let view = {
-  $(selector) {
-    return document.querySelector(selector);
-  },
   el: '.page > main',
   template: `
-    <h1>新建歌曲</h1>
+    <h2>新建歌曲</h2>
     <form class="form">
       <div class="row">
-        <label for="">
+        <label>
           歌名
-          <input type="text">
+          <input name="name" type="text" value="{{key}}">
         </label>
       </div>
       <div class="row">
-        <label for="">
+        <label>
           歌手
-          <input type="text">
+          <input name="singer" type="text">
         </label>
       </div>
       <div class="row">
-        <label for="">
+        <label>
           外链
-          <input type="text">
+          <input name="url" type="text" value="{{link}}">
         </label>
       </div>
       <div class="row action">
@@ -29,16 +28,42 @@ let view = {
       </div>
     </form>
   `,
-  render(data) {
-    this.$(this.el).innerHTML = this.template;
+  dom: null,
+  init() {
+    this.dom = document.querySelector(this.el);
+  },
+  render (data=[{key:'',link:''}]) {
+    let placholders = ['key', 'link'];
+    let html = "";
+    data.forEach(song => {
+      let template = this.template;
+      placholders.forEach(string => {
+        template = template.replace(`{{${string}}}`, song[string] || '');
+      })
+      html += template;
+    })
+    this.dom.innerHTML = html;
   },
 }
-let model = {}
+view.init();
+
+let model = {};
+
 let controller = {
   init (view, model) {
     this.view = view;
     this.model = model;
     this.view.render(this.model.data);
+    eventHub.on('upload', data => {
+      // console.log('song form 获取数据', data);
+      this.view.render(data);
+    });
+    this.bindEvents();
+  },
+  bindEvents () {
+    this.view.dom.addEventListener('submit', e => {
+      e.preventDefault();
+    });
   }
 }
 
