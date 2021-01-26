@@ -23,16 +23,15 @@ let model = {
       timeout: 10000,
       // headers: { 'X-Custom-Header': 'foobar' }
     });
-    this.getToken()
+    // this.updateToken();
+    // this.update && this.update();
+  },
+  updateToken () {
+    this.axios.get('/token')
       .then(res => {
         let data = JSON.parse(res.request.responseText);
         this.token = data.result.token;
       })
-
-    this.update && this.update();
-  },
-  getToken () {
-    return this.axios.get('/token');
   },
   upload (uploadFiles) {
     //新建一个FormData对象，加文件数据
@@ -52,11 +51,7 @@ let model = {
   },
   update () {
     setInterval (() => {
-      this.getToken()
-        .then(res => {
-          let data = JSON.parse(res.request.responseText);
-          this.token = data.result.token;
-        })
+      this.updateToken();
     }, 5 * 60 * 1000)
   }
 }
