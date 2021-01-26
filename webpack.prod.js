@@ -8,6 +8,7 @@ module.exports = merge(commonConfig, {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].[contenthash].js',
+        sourceMapFilename: '[file].map',
         // 实际部署服务及的静态文件绝对路径或相对路径
         //publicPath: "/image",
         //publicPath: "https:www.xxx.cn/image"

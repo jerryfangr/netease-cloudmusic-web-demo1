@@ -28,10 +28,15 @@ module.exports = {
   plugins: [
     // new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin(), // Generates default index.html
+    new HtmlWebpackPlugin({ // Generates default index.html
+      filename: 'index.html',
+      template: './src/assets/index.html',
+      chunks: ['index']
+    }), 
     new HtmlWebpackPlugin({  // Also generate a admin.html
       filename: 'admin.html',
-      template: './src/assets/admin.html'
+      template: './src/assets/admin.html',
+      chunks: ['admin']
     }),
   ],
 };
