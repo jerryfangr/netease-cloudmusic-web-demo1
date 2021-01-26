@@ -33,23 +33,25 @@ aside > .new-song {
   text-align: center;
   padding: 10px;
 }
-aside > .song-list {
-  // 让song-list尽可能占据空间，那么上传就会被挤到底部
+
+aside .songs-container {
+  // 让songs-container尽可能占据空间，那么上传就会被挤到底部
   flex-grow: 1;
-  text-align: left;
-  border-top: 1px solid #999;
-  li {
-    &.active {
-      background-color: #ddd;
+  .song-list {
+    text-align: left;
+    border-top: 1px solid #999;
+    li {
+      &.active {
+        background-color: #ddd;
+      }
+      border-bottom: 1px solid #ddd;
+      padding: 5px 2em;
     }
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-    padding: 5px;
   }
 }
 aside > .upload-area {
   margin-top: 5px;
-  .upload-wrapper {
+  > .upload-wrapper {
     padding: 20px 10px;
     border: 2px dashed #000;
     border-radius: 10px;
@@ -109,7 +111,5 @@ aside > .upload-area {
 main {
   padding-top: 20px;
   background-color: #ddd;
-  .form {
-
-  }
+  .form {}
 }
