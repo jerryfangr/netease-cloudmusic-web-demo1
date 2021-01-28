@@ -92,9 +92,6 @@ let controller = {
 
     this.uploadView.addEventListener('click', e => {
       this.messageView.textContent = "尝试上传..."
-      if (this.uploadFiles === null) {
-        return this.setStatus('unchoose')
-      }
       this.uploadFileToServer();
     });
   },
@@ -106,6 +103,9 @@ let controller = {
     this.stopDefault(document, "dragover"); //拖来拖去
   },
   uploadFileToServer () {
+    if (this.uploadFiles === null) {
+      return this.setStatus('unchoose')
+    }
     return this.model.upload(this.uploadFiles)
       .then((res) => {
         let result = JSON.parse(res.request.responseText).result;
