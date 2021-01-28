@@ -4,30 +4,32 @@ import { AV } from "./av";
 let view = {
   el: ".page > main",
   template: `
-    <h2>新建歌曲</h2>
-    <form class="form">
-      <div class="row">
-        <label>
-          歌名
-          <input name="name" type="text" value="{{key}}">
-        </label>
-      </div>
-      <div class="row">
-        <label>
-          歌手
-          <input name="singer" type="text">
-        </label>
-      </div>
-      <div class="row">
-        <label>
-          外链
-          <input name="url" type="text" value="{{link}}">
-        </label>
-      </div>
-      <div class="row action">
-        <button type="submit">保存</button>
-      </div>
-    </form>
+    <div class="form-container">
+      <h2>新建歌曲</h2>
+      <form class="form">
+        <div class="row">
+          <label>
+            歌名
+            <input name="name" type="text" value="{{key}}">
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            歌手
+            <input name="singer" type="text">
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            外链
+            <input name="url" type="text" value="{{link}}">
+          </label>
+        </div>
+        <div class="row action">
+          <button type="submit">保存</button>
+        </div>
+      </form>
+    </div>
   `,
   dom: null,
   init() {
@@ -45,6 +47,21 @@ let view = {
     });
     this.dom.innerHTML = html;
   },
+  close(element) { // form-container
+    while (true) {
+      if (!element || element.tagName === 'MAIN') {
+        return element === null;
+      }
+      if (!element.classList.contains('form-container')) {
+        element = element.parentNode;
+      } else {
+        break;
+      }
+    }
+
+    element.classList.add('saved');
+    element.querySelector('h2').textContent = "已保存";
+  },
   reset () {
     this.render(undefined)
   }
@@ -55,6 +72,7 @@ let model = {
   data: { id: "", name: "", singer: "", url: "" },
   init() {
     this.Song = AV.Object.extend("Song");
+    this.unsavedFileCount = 0;
   },
   create(data) {
     this.normalizeData(data);
@@ -87,6 +105,7 @@ let controller = {
     eventHub.on("upload", (data) => {
       // console.log('song form 获取数据', data);
       this.view.render(data);
+      this.model.unsavedFileCount = data.length || 0;
     });
     this.bindEvents();
   },
@@ -96,12 +115,21 @@ let controller = {
       if (e.target.tagName === "FORM") {
         let form = e.target;
         let formData = new FormData(form);
-        // console.log([form]);
         // console.log(formData.get("name"));
         this.model.create(formData)
         .then(() => {
-          this.view.reset();
+          // this.view.reset();
+          this.model.unsavedFileCount--;
           eventHub.emit('create', this.model.data);
+          if (this.model.unsavedFileCount > 0) {
+            form.addEventListener('submit', e => {
+              e.preventDefault();
+              e.stopPropagation();
+              return false;
+            });
+            return this.view.close(form);
+          }
+          this.view.reset()
         }) 
       }
     });

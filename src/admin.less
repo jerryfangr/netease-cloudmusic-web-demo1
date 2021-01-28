@@ -109,7 +109,20 @@ aside > .upload-area {
   
 }
 main {
+  .form-container {
+    margin: 5px 15px;
+    display: inline-block;
+    &.saved {
+      h2,label,input,button {
+        text-decoration: line-through;
+        pointer-events: none;
+      }
+      button {
+        cursor: not-allowed;
+      }
+    }
+    .form {}
+  }
   padding-top: 20px;
   background-color: #ddd;
-  .form {}
 }

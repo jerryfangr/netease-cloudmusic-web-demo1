@@ -15,14 +15,18 @@ view.init();
 
 let model = {
   token: undefined,
+  timer: undefined,
   init() {
     this.axios = axios.create({
       baseURL: 'http://localhost:39999/upload/',
       timeout: 10000,
       // headers: { 'X-Custom-Header': 'foobar' }
     });
-    this.updateToken();
     this.update && this.update();
+    // 监确保来回切换页面后token不过期
+    document.addEventListener('webkitvisibilitychange', () => {
+      this.update && this.update();
+    })
   },
   updateToken () {
     this.axios.get('/token')
@@ -47,10 +51,12 @@ let model = {
       }
     });
   },
-  update() {
-    setInterval(() => {
+  update () {
+    this.updateToken();
+    clearInterval(this.timer);
+    this.timer = setInterval(() => {
       this.updateToken();
-    }, 1 * 60 * 1000)
+    }, 1 * 60 * 1000);
   }
 }
 
@@ -79,7 +85,7 @@ let controller = {
       for (let i = 0; i < files.length; i++) {
         let file = files[i];
         if (this.uploadFiles[file.name] !== undefined) {
-          this.messageView.textContent = "[" + file.name + "]，已存在";
+          this.messageView.textContent = "已存在文件 [" + file.name + "]";
           return;
         }
         file.fileType = this.getFileType(file.name);
@@ -106,6 +112,7 @@ let controller = {
     if (this.uploadFiles === null) {
       return this.setStatus('unchoose')
     }
+    console.log('line 115 this.uploadFiles', this.uploadFiles);
     return this.model.upload(this.uploadFiles)
       .then((res) => {
         let result = JSON.parse(res.request.responseText).result;
@@ -119,7 +126,8 @@ let controller = {
         eventHub.emit('upload', fileLinks);
         this.setStatus('finish')
       }, error => {
-        console.log([error]);
+          // console.log([error]);
+          console.log(error.response);
           this.setStatus('error')
       });
   },
