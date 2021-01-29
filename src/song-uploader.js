@@ -14,9 +14,9 @@ let view = {
 view.init();
 
 let model = {
-  token: undefined,
-  timer: undefined,
   init() {
+    this.token = undefined;
+    this.timer = undefined;
     this.axios = axios.create({
       baseURL: 'http://localhost:39999/upload/',
       timeout: 10000,
@@ -63,11 +63,10 @@ let model = {
 model.init();
 
 let controller = {
-  view: null,
-  uploadFiles: null,
   init(view, model) {
     this.view = view;
     this.model = model;
+    this.uploadFiles = null;
     this.uploadBoxView = view.find('#uploadBox');
     this.previewView = view.find('#filePreview');
     this.uploadView = view.find('#uploadButton');
@@ -112,15 +111,14 @@ let controller = {
     if (this.uploadFiles === null) {
       return this.setStatus('unchoose')
     }
-    console.log('line 115 this.uploadFiles', this.uploadFiles);
     return this.model.upload(this.uploadFiles)
       .then((res) => {
         let result = JSON.parse(res.request.responseText).result;
         let fileLinks = [];
         for (const key in result.urls) { // 转化为真正的网页链接编码
           fileLinks.push({
-            key: key,
-            link: encodeURI(result.urls[key])
+            name: key,
+            url: encodeURI(result.urls[key])
           })
         }
         eventHub.emit('upload', fileLinks);

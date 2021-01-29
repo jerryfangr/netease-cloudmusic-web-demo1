@@ -10,7 +10,7 @@ let view = {
         <div class="row">
           <label>
             歌名
-            <input name="name" type="text" value="{{key}}">
+            <input name="name" type="text" value="{{name}}">
           </label>
         </div>
         <div class="row">
@@ -22,7 +22,7 @@ let view = {
         <div class="row">
           <label>
             外链
-            <input name="url" type="text" value="{{link}}">
+            <input name="url" type="text" value="{{url}}">
           </label>
         </div>
         <div class="row action">
@@ -35,8 +35,8 @@ let view = {
   init() {
     this.dom = document.querySelector(this.el);
   },
-  render(data = [{ key: "", link: "" }]) {
-    let placholders = ["key", "link"];
+  render(data = [{ name: "", url: "" }]) {
+    let placholders = ["name", "url"];
     let html = "";
     data.forEach((song) => {
       let template = this.template;
@@ -102,38 +102,38 @@ let controller = {
     this.view = view;
     this.model = model;
     this.view.render();
+    this.bindEvents();
     eventHub.on("upload", (data) => {
-      // console.log('song form 获取数据', data);
       this.view.render(data);
       this.model.unsavedFileCount = data.length || 0;
     });
-    this.bindEvents();
+    eventHub.on("select", (data) => {
+      this.view.render([data]);
+      this.model.unsavedFileCount = 1;
+    });
   },
   bindEvents() {
     this.view.dom.addEventListener("submit", (e) => {
       e.preventDefault();
       if (e.target.tagName === "FORM") {
         let form = e.target;
-        let formData = new FormData(form);
-        // console.log(formData.get("name"));
-        this.model.create(formData)
-        .then(() => {
-          // this.view.reset();
-          this.model.unsavedFileCount--;
-          eventHub.emit('create', this.model.data);
-          if (this.model.unsavedFileCount > 0) {
-            form.addEventListener('submit', e => {
-              e.preventDefault();
-              e.stopPropagation();
-              return false;
-            });
-            return this.view.close(form);
-          }
-          this.view.reset()
-        }) 
+        this.model.create(new FormData(form))
+          .then(() => {
+            eventHub.emit('create', this.model.data);
+            if (--this.model.unsavedFileCount > 0) {
+              form.addEventListener('submit', this.preventDefault);
+              return this.view.close(form);
+            }
+            this.view.reset()
+          }) 
       }
     });
   },
+  preventDefault (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
 };
 
 controller.defaultInit = function () {

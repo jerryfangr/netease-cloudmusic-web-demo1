@@ -4,30 +4,38 @@ import { AV } from "./av";
 let view = {
   el: '.page > aside > #songsContainer',
   dom: null,
-  init() {
-    this.dom = document.querySelector(this.el);
-  },
-  find(selector) {
-    return this.dom.querySelector(selector);
-  },
   template: `
     <ul class="song-list"></ul>
   `,
+  init() {
+    this.dom = document.querySelector(this.el);
+  },
+  findAll(selector) {
+    return this.dom.querySelectorAll(selector);
+  },
   render(data) {
     if (data === undefined || data.songs.length === 0) {
       return this.dom.innerHTML = this.template;
     }
     
     this.songContainerDom = this.songContainerDom || this.dom.querySelector('.song-list');
-    let html = ""
+    let html = ''
     data.songs && data.songs.forEach(song => {
-      html += "<li>" + song.name +"</li>";
+      html += '<li data-id="' + song.id + '">' + song.name +'</li>';
     });
     this.songContainerDom.innerHTML = html;
   },
+  activeItem (liDom) {
+    this.deActive();
+    liDom.classList.add('active')
+  },
   deActive () {
-    let activeDom = this.find('.active');
-    activeDom && activeDom.classList.remove('active');
+    let activeDoms = this.findAll('.active');
+    if (activeDoms.length > 0) {
+      activeDoms.forEach(activeDom => {
+        activeDom.classList.remove('active');
+      })
+    }
   }
 }
 view.init();
@@ -47,6 +55,17 @@ let model = {
         }))
         return this.data.songs;
       });
+  },
+  findBy (key, value) {
+    let songs = this.data.songs;
+    for (let i = 0; i < songs.length; i++) {
+      if (songs[i][key] === value) {
+        return songs[i];
+      }
+    }
+  },
+  findById (id) {
+    return this.findBy('id', id);
   }
 }
 
@@ -54,19 +73,28 @@ let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
+    this.preSelectDom = null;
     this.view.render(this.model.data);
+    this.fetchSongs();
     this.bindEvents();
     this.bindEventHub();
-    this.fetSongs()
   },
-  fetSongs () {
+  fetchSongs () {
     this.model.find()
       .then(() => {
         this.view.render(this.model.data)
       })
   },
   bindEvents () {
-
+    this.view.dom.addEventListener('click', e => {
+      if (e.target.tagName === "LI" && this.preSelectDom !== e.target) {
+        this.preSelectDom = e.target;
+        this.view.activeItem(e.target);
+        // let id = e.target.getAttribute('data-id');
+        let song = this.model.findById(e.target.dataset.id);
+        eventHub.emit('select', this.copy(song));
+      }
+    });
   },
   bindEventHub () {
     eventHub.on('upload', data => {
@@ -78,6 +106,9 @@ let controller = {
       this.model.data.songs.push(data);
       this.view.render(this.model.data)
     })
+  },
+  copy (obj) {
+    return JSON.parse(JSON.stringify(obj));
   }
 }
 

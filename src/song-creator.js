@@ -6,12 +6,16 @@ let view = {
   init() {
     this.dom = document.querySelector(this.el);
   },
-  template: `
-    新建歌曲
-  `,
+  template: `新建歌曲`,
   render(data) {
     this.dom.innerHTML = this.template;
   },
+  active () {
+    this.dom.classList.add('active');
+  },
+  deActive () {
+    this.dom.classList.remove('active');
+  }
 }
 view.init();
 
@@ -22,12 +26,16 @@ let controller = {
     this.view = view;
     this.model = model;
     this.view.render(this.model.data);
+    this.active();
     eventHub.on('upload', data => {
       this.active()
     })
+    eventHub.on('select', data => {
+      this.view.deActive()
+    })
   },
   active () {
-    this.view.dom.classList.add('active');
+    this.view.active();
   }
 }
 
