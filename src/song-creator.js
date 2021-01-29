@@ -27,6 +27,13 @@ let controller = {
     this.model = model;
     this.view.render(this.model.data);
     this.active();
+    this.bindEvents();
+  },
+  bindEvents () {
+    this.view.dom.addEventListener('click', e => {
+      this.active();
+      eventHub.emit('new');
+    })
     eventHub.on('upload', data => {
       this.active()
     })

@@ -4,8 +4,19 @@ import eventHub from './event-hub';
 let view = {
   el: '.page > aside > .upload-area',
   dom: null,
+  template: `
+    <div id="uploadBox" class="upload-wrapper">
+      <div id="filePreview" class="upload-preview"></div>
+      <span id="uploadButton" class="upload-button">上传全部</span>
+      <p id="uploadMessage">拖曳上传，文件大小限制 30MB</p>
+    </div>
+  `,
   init () {
     this.dom = document.querySelector(this.el);
+    this.render();
+  },
+  render(data) {
+    this.dom.innerHTML = this.template;
   },
   find (selector) {
     return this.dom.querySelector(selector);
@@ -20,13 +31,8 @@ let model = {
     this.axios = axios.create({
       baseURL: 'http://localhost:39999/upload/',
       timeout: 10000,
-      // headers: { 'X-Custom-Header': 'foobar' }
     });
-    this.update && this.update();
-    // 监确保来回切换页面后token不过期
-    document.addEventListener('webkitvisibilitychange', () => {
-      this.update && this.update();
-    })
+    this.update();
   },
   updateToken () {
     this.axios.get('/token')
@@ -74,6 +80,11 @@ let controller = {
     this.bindEvents();
   },
   bindEvents() {
+    // 监确保来回切换页面后model token不过期
+    document.addEventListener('webkitvisibilitychange', () => {
+      this.model.update();
+    })
+
     this.stopDefaultDrop();
     this.uploadBoxView.addEventListener("drop", e => {
       var files = e.dataTransfer.files; //获取文件对象

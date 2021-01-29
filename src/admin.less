@@ -1,8 +1,15 @@
+/* param */
+@active-color: #ddd;
+.active {
+  background-color: @active-color;
+}
+
+
+/* common */
 * { margin: 0;padding: 0;}
 ul,ol { list-style: none; }
 a {color: inherit; text-decoration: none;}
 input {font: inherit;}
-
 body {
   font-size: 14px;
   line-height: 1.5;
@@ -28,21 +35,27 @@ aside {
 }
 aside > .new-song {
   &.active {
-    background-color: #ddd;
+    .active();
   }
+  &:hover {
+    background-color: #d4d4d4;
+  }
+  cursor: pointer;
   text-align: center;
   padding: 10px;
 }
-
-aside .songs-container {
-  // 让songs-container尽可能占据空间，那么上传就会被挤到底部
+aside > .songs-container {
+  // 让songs-container尽可能占据空间，那么upload-area就被挤到底部
   flex-grow: 1;
   .song-list {
     text-align: left;
     border-top: 1px solid #999;
     li {
       &.active {
-        background-color: #ddd;
+        .active();
+      }
+      &:hover {
+        background-color: #d4d4d4;
       }
       border-bottom: 1px solid #ddd;
       padding: 5px 2em;

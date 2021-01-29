@@ -102,10 +102,13 @@ let controller = {
     })
     eventHub.on('create', data => {
       // 这里如果data是对象，且不能保证传过来的是新的，就要创建新对象
-      // 以防一直存同一个对象的引用，或者被对面改了数据
       this.model.data.songs.push(data);
       this.view.render(this.model.data)
     })
+    eventHub.on("new", (data) => {
+      this.view.deActive();
+      this.preSelectDom = null;
+    });
   },
   copy (obj) {
     return JSON.parse(JSON.stringify(obj));

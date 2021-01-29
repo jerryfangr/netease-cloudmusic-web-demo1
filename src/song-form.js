@@ -16,7 +16,7 @@ let view = {
         <div class="row">
           <label>
             歌手
-            <input name="singer" type="text">
+            <input name="singer" type="text" value="{{singer}}">
           </label>
         </div>
         <div class="row">
@@ -34,18 +34,27 @@ let view = {
   dom: null,
   init() {
     this.dom = document.querySelector(this.el);
+    this.render();
   },
-  render(data = [{ name: "", url: "" }]) {
-    let placholders = ["name", "url"];
-    let html = "";
+  render(data = [{ name: '', singer: '', url: '' }]) {
+    let html = '';
+    let placholders = ['name', 'singer', 'url'];
     data.forEach((song) => {
       let template = this.template;
       placholders.forEach((string) => {
-        template = template.replace(`{{${string}}}`, song[string] || "");
+        template = template.replace(`{{${string}}}`, song[string] || '');
       });
       html += template;
     });
     this.dom.innerHTML = html;
+    if (data.length === 1 && !!data[0].id) {
+      this.setTitle('编辑歌曲');
+    }
+  },
+  setTitle (title) {
+    this.dom.querySelectorAll('h2').forEach(h2 => {
+      h2.textContent = title;
+    })
   },
   close(element) { // form-container
     while (true) {
@@ -101,8 +110,10 @@ let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
-    this.view.render();
     this.bindEvents();
+    this.bindEventHub();
+  },
+  bindEventHub() {
     eventHub.on("upload", (data) => {
       this.view.render(data);
       this.model.unsavedFileCount = data.length || 0;
@@ -110,6 +121,9 @@ let controller = {
     eventHub.on("select", (data) => {
       this.view.render([data]);
       this.model.unsavedFileCount = 1;
+    });
+    eventHub.on("new", (data) => {
+      this.reset();
     });
   },
   bindEvents() {
@@ -133,6 +147,11 @@ let controller = {
     e.preventDefault();
     e.stopPropagation();
     return false;
+  },
+  reset () {
+    this.unsavedFileCount = 0;
+    this.view.reset();
+
   }
 };
 
