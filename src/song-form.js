@@ -56,20 +56,14 @@ let view = {
       h2.textContent = title;
     })
   },
-  close(element) { // form-container
-    while (true) {
-      if (!element || element.tagName === 'MAIN') {
-        return element === null;
-      }
-      if (!element.classList.contains('form-container')) {
-        element = element.parentNode;
-      } else {
-        break;
-      }
-    }
-
-    element.classList.add('saved');
-    element.querySelector('h2').textContent = "已保存";
+  close() { // form-container
+    this.formContainerDom = this.formContainerDom || this.dom.querySelector('.form-container')
+    this.formContainerDom.classList.add('close');
+    this.formContainerDom.querySelector('h2').textContent = "已保存";
+  },
+  save() {
+    this.formContainerDom = this.formContainerDom || this.dom.querySelector('.form-container')
+    this.formContainerDom.querySelector('h2').textContent = "已保存 - " + new Date().toString().split('GMT')[0];
   },
   reset () {
     this.render(undefined)
@@ -78,17 +72,15 @@ let view = {
 view.init();
 
 let model = {
-  data: { id: "", name: "", singer: "", url: "" },
+  data: { name: '', singer: '', url: '' },
   init() {
+    this.isCreate = true;
     this.Song = AV.Object.extend("Song");
     this.unsavedFileCount = 0;
   },
   create(data) {
-    this.normalizeData(data);
     let song = new this.Song();
-    for (const key in this.data) {
-      song.set(key, data.get(key));
-    }
+    this.setDataToSong(data, song);
     return song.save().then((song) => {
       let { id, attributes } = song;
       // 该数据会被传递，确保不一样，Object.assign(this.data, { ...attributes });
@@ -96,11 +88,27 @@ let model = {
       this.data.id = id; // attributes id 为 null
     });
   },
+  update(data) {
+    let song = AV.Object.createWithoutData('Song', this.data.id);
+    this.setDataToSong(data, song);
+    return song.save()
+      .then(() => {
+        return { ...this.data };
+      });
+  },
+  setDataToSong(data, song) {
+    this.normalizeData(data);
+    for (const key in this.data) {
+      this.data[key] = data.get(key);
+      song.set(key, data.get(key));
+    }
+    this.data.id = song.id;
+  },
   normalizeData(data) {
     data.get =
       data.get ||
       function (key) {
-        return data[key];
+        return this[key];
       };
   },
 };
@@ -110,19 +118,25 @@ let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
+    this.formClass = 'new';
     this.bindEvents();
     this.bindEventHub();
   },
   bindEventHub() {
     eventHub.on("upload", (data) => {
+      this.updateStatus('create', true);
       this.view.render(data);
       this.model.unsavedFileCount = data.length || 0;
     });
     eventHub.on("select", (data) => {
-      this.view.render([data]);
+      this.updateStatus('select', false);
+      this.model.data = data[0];
+      this.view.render(data);
       this.model.unsavedFileCount = 1;
     });
-    eventHub.on("new", (data) => {
+    eventHub.on('new', (data) => {
+      if (this.formClass === 'new') { return; }
+      this.updateStatus('new', true);
       this.reset();
     });
   },
@@ -130,18 +144,36 @@ let controller = {
     this.view.dom.addEventListener("submit", (e) => {
       e.preventDefault();
       if (e.target.tagName === "FORM") {
-        let form = e.target;
-        this.model.create(new FormData(form))
-          .then(() => {
-            eventHub.emit('create', this.model.data);
-            if (--this.model.unsavedFileCount > 0) {
-              form.addEventListener('submit', this.preventDefault);
-              return this.view.close(form);
-            }
-            this.view.reset()
-          }) 
+        if (this.model.isCreate) {
+          this.createSong(e.target);
+        } else {
+          this.updateSong(e.target);
+        }
       }
     });
+  },
+  updateStatus(formClass, editStatus) {
+    this.formClass = formClass;
+    this.model.isCreate = editStatus;
+  },
+  createSong(form) {
+    this.model.create(new FormData(form))
+      .then(() => {
+        eventHub.emit('create', this.model.data);
+        if (--this.model.unsavedFileCount > 0) {
+          form.addEventListener('submit', this.preventDefault);
+          return this.view.close(form);
+        }
+        this.formClass = 'none';
+        this.view.reset()
+      }) 
+  },
+  updateSong(form) {
+    this.model.update(new FormData(form))
+      .then((data) => {
+        this.view.save(form);
+        eventHub.emit('update', data);
+      })
   },
   preventDefault (e) {
     e.preventDefault();
@@ -151,7 +183,6 @@ let controller = {
   reset () {
     this.unsavedFileCount = 0;
     this.view.reset();
-
   }
 };
 

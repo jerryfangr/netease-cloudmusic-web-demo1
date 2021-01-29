@@ -60,12 +60,12 @@ let model = {
     let songs = this.data.songs;
     for (let i = 0; i < songs.length; i++) {
       if (songs[i][key] === value) {
-        return songs[i];
+        return [songs[i], i];
       }
     }
   },
   findById (id) {
-    return this.findBy('id', id);
+    return this.findBy('id', id)[0];
   }
 }
 
@@ -92,7 +92,7 @@ let controller = {
         this.view.activeItem(e.target);
         // let id = e.target.getAttribute('data-id');
         let song = this.model.findById(e.target.dataset.id);
-        eventHub.emit('select', this.copy(song));
+        eventHub.emit('select', [this.copy(song)]);
       }
     });
   },
@@ -108,6 +108,13 @@ let controller = {
     eventHub.on("new", (data) => {
       this.view.deActive();
       this.preSelectDom = null;
+    });
+    eventHub.on('update', (data) => {
+      let index = this.model.findBy('id', data.id)[1];
+      this.model.data.songs[index] = data;
+      this.view.render(this.model.data);
+      this.preSelectDom = this.view.dom.querySelector('[data-id="' + this.preSelectDom.dataset.id + '"]')
+      this.view.activeItem(this.preSelectDom);
     });
   },
   copy (obj) {
