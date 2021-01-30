@@ -65,6 +65,16 @@ aside > .songs-container {
 }
 aside > .upload-area {
   margin-top: 5px;
+  &.loding {
+    .upload-wrapper > .upload-button {
+      transition: padding .2s;
+      font-size: 0px;
+      border-radius: 50%;
+      border: 3px dashed #799ccf;
+      padding: 13px;
+      animation: rotate 1s linear infinite;
+    }
+  }
   > .upload-wrapper {
     padding: 20px 10px;
     border: 2px dashed #000;
@@ -88,6 +98,9 @@ aside > .upload-area {
       padding: 3px 5px;
       border: 1px solid #799ccf;
       border-radius: 5px;
+      &:hover {
+        background-color: #c4dcff;
+      }
     }
     .upload-button:hover {
       cursor: pointer;
@@ -95,6 +108,14 @@ aside > .upload-area {
     p {
       color: red;
     }
+  }
+}
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 
@@ -119,8 +140,8 @@ aside > .upload-area {
     padding: 4px 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    cursor: pointer;
   }
-  
 }
 main {
   .form-container {

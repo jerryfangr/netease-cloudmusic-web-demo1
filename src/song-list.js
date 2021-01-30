@@ -102,7 +102,7 @@ let controller = {
     })
     eventHub.on('create', data => {
       // 这里如果data是对象，且不能保证传过来的是新的，就要创建新对象
-      this.model.data.songs.push(data);
+      this.model.data.songs.push(this.copy(data));
       this.view.render(this.model.data)
     })
     eventHub.on("new", (data) => {
