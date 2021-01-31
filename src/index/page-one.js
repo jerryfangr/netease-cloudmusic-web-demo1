@@ -1,4 +1,6 @@
 import eventHub from '../vendor/event-hub';
+import playlists from './page-one-playlists';
+import songs from './page-one-songs';
 
 let view = {
   el: '#page > ol > .page-1',
@@ -21,8 +23,10 @@ let controller = {
     this.view = view;
     this.model = model;
     this.view.init();
-    this.bindEvents();
+    // this.bindEvents();
     this.bindEventHub();
+    this.loadModules();
+
   },
   bindEvents() {},
   bindEventHub () {
@@ -33,8 +37,11 @@ let controller = {
         this.view.hide();
       }
     });
+  },
+  loadModules () {
+    playlists.defaultInit();
+    songs.defaultInit();
   }
-
 }
 
 controller.defaultInit = function () {
