@@ -1,5 +1,5 @@
 import axios from 'axios';
-import eventHub from './event-hub';
+import eventHub from '../vendor/event-hub';
 
 const STATE = {
   WAIT_SELECT: Symbol('select file'),
@@ -91,7 +91,6 @@ let view = {
     return inputDom;
   }
 }
-view.init();
 
 let model = {
   init() {
@@ -135,12 +134,12 @@ let model = {
   }
 }
 
-model.init();
-
 let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
+    this.view.init();
+    this.model.init();
     this.uploadFiles = null;
     this.bindEvents();
   },
@@ -201,7 +200,7 @@ let controller = {
         for (const key in result.urls) { // 转化为真正的网页链接编码
           fileLinks.push({name: key, url: encodeURI(result.urls[key])})
         }
-        eventHub.emit('upload', fileLinks);
+        eventHub.emit('admin-upload', fileLinks);
         this.view.updateByState(STATE.UPLOAD_SUCCESS);
         this.uploadFiles = null;
       }, error => {

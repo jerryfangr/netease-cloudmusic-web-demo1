@@ -1,4 +1,4 @@
-import eventHub from './event-hub';
+import eventHub from '../vendor/event-hub';
 
 let view = {
   el: '.page > aside > .new-song',
@@ -17,7 +17,7 @@ let view = {
     this.dom.classList.remove('active');
   }
 }
-view.init();
+
 
 let model = {}
 
@@ -25,6 +25,7 @@ let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
+    this.view.init();
     this.view.render(this.model.data);
     this.active();
     this.bindEvents();
@@ -32,12 +33,12 @@ let controller = {
   bindEvents () {
     this.view.dom.addEventListener('click', e => {
       this.active();
-      eventHub.emit('new');
+      eventHub.emit('admin-new');
     })
-    eventHub.on('upload', data => {
+    eventHub.on('admin-upload', data => {
       this.active()
     })
-    eventHub.on('select', data => {
+    eventHub.on('admin-select', data => {
       this.view.deActive()
     })
   },

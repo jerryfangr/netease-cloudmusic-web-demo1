@@ -1,4 +1,4 @@
-import eventHub from "./event-hub";
+import eventHub from '../vendor/event-hub';
 import { AV } from "../vendor/av";
 
 let view = {
@@ -76,7 +76,6 @@ let view = {
     this.render(undefined)
   },
 };
-view.init();
 
 let model = {
   data: { name: '', singer: '', url: '' },
@@ -119,29 +118,31 @@ let model = {
       };
   },
 };
-model.init();
+
 
 let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
+    this.view.init();
+    this.model.init();
     this.formType = 'new';
     this.bindEvents();
     this.bindEventHub();
   },
   bindEventHub() {
-    eventHub.on("upload", (data) => {
+    eventHub.on("admin-upload", (data) => {
       this.updateStatus('create', true);
       this.view.render(data);
       this.model.unsavedFileCount = data.length || 0;
     });
-    eventHub.on("select", (data) => {
+    eventHub.on("admin-select", (data) => {
       this.updateStatus('select', false);
       this.model.data = data[0];
       this.view.render(data);
       this.model.unsavedFileCount = 1;
     });
-    eventHub.on('new', (data) => {
+    eventHub.on('admin-new', (data) => {
       if (this.formType === 'new') { return; }
       this.updateStatus('new', true);
       this.reset();
@@ -166,7 +167,7 @@ let controller = {
   createSong(form) {
     this.checkInput(form, this.model.create(new FormData(form), form), action => {
       action.then(() => {
-        eventHub.emit('create', this.model.data);
+        eventHub.emit('admin-create', this.model.data);
         if (--this.model.unsavedFileCount > 0) {
           form.addEventListener('submit', this.preventDefault);
           return this.view.close(form);
@@ -180,7 +181,7 @@ let controller = {
     this.checkInput(form, this.model.update(new FormData(form), form), action => {
       action.then((data) => {
         this.view.save(form);
-        eventHub.emit('update', data);
+        eventHub.emit('admin-update', data);
       })
     })
   },

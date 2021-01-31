@@ -1,4 +1,4 @@
-import eventHub from './event-hub';
+import eventHub from '../vendor/event-hub';
 import { AV } from "../vendor/av";
 
 let view = {
@@ -38,7 +38,6 @@ let view = {
     }
   }
 }
-view.init();
 
 let model = {
   data: {
@@ -73,6 +72,7 @@ let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
+    this.view.init();
     this.preSelectDom = null;
     this.view.render(this.model.data);
     this.fetchSongs();
@@ -92,24 +92,24 @@ let controller = {
         this.view.activeItem(e.target);
         // let id = e.target.getAttribute('data-id');
         let song = this.model.findById(e.target.dataset.id);
-        eventHub.emit('select', [this.copy(song)]);
+        eventHub.emit('admin-select', [this.copy(song)]);
       }
     });
   },
   bindEventHub () {
-    eventHub.on('upload', data => {
+    eventHub.on('admin-upload', data => {
       this.view.deActive()
     })
-    eventHub.on('create', data => {
+    eventHub.on('admin-create', data => {
       // 这里如果data是对象，且不能保证传过来的是新的，就要创建新对象
       this.model.data.songs.push(this.copy(data));
       this.view.render(this.model.data)
     })
-    eventHub.on("new", (data) => {
+    eventHub.on("admin-new", (data) => {
       this.view.deActive();
       this.preSelectDom = null;
     });
-    eventHub.on('update', (data) => {
+    eventHub.on('admin-update', (data) => {
       let index = this.model.findBy('id', data.id)[1];
       this.model.data.songs[index] = data;
       this.view.render(this.model.data);
