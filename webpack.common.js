@@ -5,8 +5,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: {
-    index: './src/index.js',
-    admin: './src/admin.js'
+    index: './src/index/index.js',
+    admin: './src/admin/admin.js'
   },
   output: {
     filename: '[name].[contenthash].js',

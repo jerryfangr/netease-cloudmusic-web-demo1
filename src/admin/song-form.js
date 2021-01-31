@@ -1,5 +1,5 @@
 import eventHub from "./event-hub";
-import { AV } from "./av";
+import { AV } from "../vendor/av";
 
 let view = {
   el: ".page > main",
@@ -48,26 +48,33 @@ let view = {
     });
     this.dom.innerHTML = html;
     if (data.length === 1 && !!data[0].id) {
-      this.setTitle('编辑歌曲');
+      this.setAllTitle('编辑歌曲');
     }
   },
-  setTitle (title) {
+  setAllTitle (title) {
     this.dom.querySelectorAll('h2').forEach(h2 => {
       h2.textContent = title;
     })
   },
-  close() { // form-container
-    this.formContainerDom = this.formContainerDom || this.dom.querySelector('.form-container')
-    this.formContainerDom.classList.add('close');
-    this.formContainerDom.querySelector('h2').textContent = "已保存";
+  close(form) { // form-container
+    this.setTitle(form, 'close', '已保存');
   },
-  save() {
-    this.formContainerDom = this.formContainerDom || this.dom.querySelector('.form-container')
-    this.formContainerDom.querySelector('h2').textContent = "已保存 - " + new Date().toString().split('GMT')[0];
+  warning (form, content) {
+    this.setTitle(form, 'warning', content);
+  },
+  save(form) {
+    this.setTitle(form, undefined, "已保存 - " + new Date().toString().split('GMT')[0])
+  },
+  setTitle(form, className, content) {
+    let formContainer = form.parentNode;
+    formContainer.classList.remove('close');
+    formContainer.classList.remove('warning');
+    className && formContainer.classList.add(className);
+    formContainer.querySelector('h2').textContent = content;
   },
   reset () {
     this.render(undefined)
-  }
+  },
 };
 view.init();
 
@@ -80,18 +87,17 @@ let model = {
   },
   create(data) {
     let song = new this.Song();
-    this.setDataToSong(data, song);
-    return song.save().then((song) => {
+    let result = this.setDataToSong(data, song);
+    return !result ? result : song.save().then((song) => {
       let { id, attributes } = song;
-      // 该数据会被传递，确保不一样，Object.assign(this.data, { ...attributes });
       this.data = { ...attributes};
       this.data.id = id; // attributes id 为 null
     });
   },
   update(data) {
     let song = AV.Object.createWithoutData('Song', this.data.id);
-    this.setDataToSong(data, song);
-    return song.save()
+    let result = this.setDataToSong(data, song);
+    return !result ? result : song.save()
       .then(() => {
         return { ...this.data };
       });
@@ -103,6 +109,7 @@ let model = {
       song.set(key, data.get(key));
     }
     this.data.id = song.id;
+    return data.get('name') ? true : false;;
   },
   normalizeData(data) {
     data.get =
@@ -118,7 +125,7 @@ let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
-    this.formClass = 'new';
+    this.formType = 'new';
     this.bindEvents();
     this.bindEventHub();
   },
@@ -135,7 +142,7 @@ let controller = {
       this.model.unsavedFileCount = 1;
     });
     eventHub.on('new', (data) => {
-      if (this.formClass === 'new') { return; }
+      if (this.formType === 'new') { return; }
       this.updateStatus('new', true);
       this.reset();
     });
@@ -152,28 +159,36 @@ let controller = {
       }
     });
   },
-  updateStatus(formClass, editStatus) {
-    this.formClass = formClass;
+  updateStatus(formType, editStatus) {
+    this.formType = formType;
     this.model.isCreate = editStatus;
   },
   createSong(form) {
-    this.model.create(new FormData(form))
-      .then(() => {
+    this.checkInput(form, this.model.create(new FormData(form), form), action => {
+      action.then(() => {
         eventHub.emit('create', this.model.data);
         if (--this.model.unsavedFileCount > 0) {
           form.addEventListener('submit', this.preventDefault);
           return this.view.close(form);
         }
-        this.formClass = 'none';
+        this.formType = 'none';
         this.view.reset()
       }) 
+    })
   },
   updateSong(form) {
-    this.model.update(new FormData(form))
-      .then((data) => {
+    this.checkInput(form, this.model.update(new FormData(form), form), action => {
+      action.then((data) => {
         this.view.save(form);
         eventHub.emit('update', data);
       })
+    })
+  },
+  checkInput(form, result, callback) {
+    if (result === false) {
+      return this.view.warning(form, '至少输入歌名')
+    }
+    callback(result);
   },
   preventDefault (e) {
     e.preventDefault();

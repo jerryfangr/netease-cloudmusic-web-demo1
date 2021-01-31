@@ -55,7 +55,7 @@ let view = {
   dataByState(state, fileInfo) {
     switch (state) {
       case STATE.WAIT_SELECT:
-        return { buttonText: '选择文件', messageText: '支持拖曳上传，单文件限制 0-30MB' };
+        return { buttonText: '选择文件', messageText: '支持拖曳上传，每个文件限制 0-30MB' };
       case STATE.NO_SELECTED:
         return { buttonText: '选择文件', messageText: '未选中任何文件' };
       case STATE.FILE_EXISTS:

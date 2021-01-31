@@ -1,5 +1,5 @@
 import eventHub from './event-hub';
-import { AV } from "./av";
+import { AV } from "../vendor/av";
 
 let view = {
   el: '.page > aside > #songsContainer',
