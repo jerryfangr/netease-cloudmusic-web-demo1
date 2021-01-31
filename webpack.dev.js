@@ -29,7 +29,7 @@ module.exports = merge(commonConfig, {
     // 热更新
     devServer: {
         // 多个输出，配置当前调试的页面，否则为根路径http://localhost:3333/
-        openPage: 'admin.html',
+        openPage: 'index.html',
         // 项目构建目录
         contentBase: './dist',
         // 启动gzip压缩
