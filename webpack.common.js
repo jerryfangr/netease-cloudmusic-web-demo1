@@ -6,7 +6,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = {
   entry: {
     index: './src/index/index.js',
-    admin: './src/admin/admin.js'
+    admin: './src/admin/admin.js',
+    player: './src/player/player.js'
   },
   output: {
     filename: '[name].[contenthash].js',
@@ -21,7 +22,12 @@ module.exports = {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
           chunks: 'all',
-        }
+        },
+        myVendor: {
+          test: /[\\/]src[\\/]vendor[\\/]/,
+          name: 'vendor',
+          chunks: 'all',
+        }        
       }
     },
   },
@@ -37,6 +43,11 @@ module.exports = {
       filename: 'admin.html',
       template: './src/assets/admin.html',
       chunks: ['admin']
+    }),
+    new HtmlWebpackPlugin({  // Also generate a admin.html
+      filename: 'player.html',
+      template: './src/assets/player.html',
+      chunks: ['player']
     }),
   ],
 };

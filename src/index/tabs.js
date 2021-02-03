@@ -38,7 +38,6 @@ let controller = {
     this.view.dom.addEventListener('click', e => {
       let liDom = this.view.findDomWith('li', e.target);
       if (liDom !== null) {
-        console.log([liDom]);
         this.view.active(liDom);
         eventHub.emit('index-selectTab', liDom.dataset.tab);
       }

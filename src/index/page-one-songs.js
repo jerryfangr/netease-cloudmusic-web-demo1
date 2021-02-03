@@ -11,7 +11,7 @@ let view = {
       </svg>
       {{singer}}
     </p>
-    <a class="playButton" href="{{url}}">
+    <a class="playButton" href="./player.html?id={{id}}">
       <svg class="icon icon-play">
         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-play"></use
       </svg>
