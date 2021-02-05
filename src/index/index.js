@@ -1,5 +1,5 @@
 import './index.less';
-import '../assets/ali-svg';
+import '../asserts/ali-svg';
 // import { AV } from "../vendor/av";
 import tabs from './tabs'
 import pageOne from './page-one'

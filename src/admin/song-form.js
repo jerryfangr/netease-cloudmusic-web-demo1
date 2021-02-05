@@ -9,6 +9,12 @@ let view = {
       <form class="form">
         <div class="row">
           <label>
+            封面
+            <input name="cover" type="text" value="{{cover}}">
+          </label>
+        </div>
+        <div class="row">
+          <label>
             歌名
             <input name="name" type="text" value="{{name}}">
           </label>
@@ -31,21 +37,21 @@ let view = {
       </form>
     </div>
   `,
-  dom: null,
   init() {
     this.dom = document.querySelector(this.el);
     this.render();
   },
-  render(data = [{ name: '', singer: '', url: '' }]) {
+  render(data = [{ name: '', singer: '', url: '', cover: '' }]) {
+    data = Array.isArray(data) ? data : [data];
     let html = '';
-    let placholders = ['name', 'singer', 'url'];
     data.forEach((song) => {
       let template = this.template;
-      placholders.forEach((string) => {
-        template = template.replace(`{{${string}}}`, song[string] || '');
-      });
+      for (const key in song) {
+        template = template.replace(`{{${key}}}`, song[key] || '');
+      }
       html += template;
     });
+
     this.dom.innerHTML = html;
     if (data.length === 1 && !!data[0].id) {
       this.setAllTitle('编辑歌曲');
@@ -78,11 +84,15 @@ let view = {
 };
 
 let model = {
-  data: { name: '', singer: '', url: '' },
+  data: { name: '', singer: '', url: '', cover: '' },
   init() {
     this.isCreate = true;
     this.Song = AV.Object.extend("Song");
     this.unsavedFileCount = 0;
+  },
+  resetData (data) {
+    this.data = { name: '', singer: '', url: '', cover: '' };
+    Object.assign(this.data, data);
   },
   create(data) {
     let song = new this.Song();
@@ -138,8 +148,8 @@ let controller = {
     });
     eventHub.on("admin-select", (data) => {
       this.updateStatus('select', false);
-      this.model.data = data[0];
-      this.view.render(data);
+      this.model.resetData(data[0]);
+      this.view.render(this.model.data);
       this.model.unsavedFileCount = 1;
     });
     eventHub.on('admin-new', (data) => {

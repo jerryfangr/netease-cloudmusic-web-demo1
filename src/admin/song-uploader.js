@@ -196,11 +196,11 @@ let controller = {
     return this.model.upload(this.uploadFiles)
       .then((res) => {
         let result = JSON.parse(res.request.responseText).result;
-        let fileLinks = [];
+        let fileData = [];
         for (const key in result.urls) { // 转化为真正的网页链接编码
-          fileLinks.push({name: key, url: encodeURI(result.urls[key])})
+          fileData.push({name: key, url: encodeURI(result.urls[key]), cover: '', singer:''});
         }
-        eventHub.emit('admin-upload', fileLinks);
+        eventHub.emit('admin-upload', fileData);
         this.view.updateByState(STATE.UPLOAD_SUCCESS);
         this.uploadFiles = null;
       }, error => {

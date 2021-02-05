@@ -31,22 +31,43 @@ module.exports = {
       }
     },
   },
+  module: {
+    rules: [
+      // {
+      //   test: /\.(png|svg|jpg|jpeg|gif)$/i,
+      //   type: 'asset/resource',
+      // },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              // 超过2k的文件打包为为图片文件，否则base64代码显示在HTML页面
+              limit: 2 * 1024,
+              name: "asserts/img/[hash].[ext]",
+            }
+          }
+        ]
+      }
+    ]
+  },
   plugins: [
     // new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({ // Generates default index.html
       filename: 'index.html',
-      template: './src/assets/index.html',
+      template: './src/asserts/index.html',
       chunks: ['index']
     }), 
     new HtmlWebpackPlugin({  // Also generate a admin.html
       filename: 'admin.html',
-      template: './src/assets/admin.html',
+      template: './src/asserts/admin.html',
       chunks: ['admin']
     }),
     new HtmlWebpackPlugin({  // Also generate a admin.html
       filename: 'player.html',
-      template: './src/assets/player.html',
+      template: './src/asserts/player.html',
       chunks: ['player']
     }),
   ],

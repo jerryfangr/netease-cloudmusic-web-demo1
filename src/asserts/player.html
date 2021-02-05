@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>播放页面 | music player</title>
+  </head>
+  <body>
+    <div class="page" id="app">
+      <div class="blur-bg" id="blurBg"></div>
+      <div class="disc-container" id="discContainer">
+        <img class="pointer" alt=""/>
+        <div class="disc">
+          <div class="icon-wrapper">
+            <svg class="icon icon-play" id="play">
+              <use xlink:href="#icon-play"></use>
+            </svg>
+            <svg class="icon icon-pause" id="pause">
+              <use xlink:href="#icon-pause"></use>
+            </svg>
+          </div>
+          <img class="ring"alt=""/>
+          <img class="light"alt=""/>
+          <img class="cover"/>
+        </div>
+      </div>
+      <div class="song-description">
+        <h1></h1>
+        <div class="lyric">
+          <div class="lines"></div>
+        </div>
+      </div>
+      <div class="links">
+        <a href="#">打开</a>
+        <a class="main" href="#">下载</a>
+      </div>
+    </div>
+  </body>
+</html>
