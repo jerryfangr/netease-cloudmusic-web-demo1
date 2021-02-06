@@ -4,7 +4,7 @@ let view = {
   el: '.page-1 > section.songs',
   template: `
   <li>
-  <h3>{{name}}</h3>
+    <h3>{{name}}</h3>
     <p>
       <svg class="icon icon-sq">
         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-sq"></use>

@@ -31,17 +31,23 @@ let view = {
             <input name="url" type="text" value="{{url}}">
           </label>
         </div>
+        <div class="row">
+          <label>
+            歌词
+            <textarea name="lyric"cols="30" rows="10">{{lyric}}</textarea>
+          </label>
+        </div>
         <div class="row action">
           <button type="submit">保存</button>
         </div>
       </form>
     </div>
   `,
-  init() {
+  init(data) {
     this.dom = document.querySelector(this.el);
-    this.render();
+    this.render(data);
   },
-  render(data = [{ name: '', singer: '', url: '', cover: '' }]) {
+  render(data = [{ name: '', singer: '', url: '', cover: '', lyric:'' }]) {
     data = Array.isArray(data) ? data : [data];
     let html = '';
     data.forEach((song) => {
@@ -84,15 +90,15 @@ let view = {
 };
 
 let model = {
-  data: { name: '', singer: '', url: '', cover: '' },
   init() {
     this.isCreate = true;
     this.Song = AV.Object.extend("Song");
-    this.unsavedFileCount = 0;
+    this.resetData({});
   },
   resetData (data) {
-    this.data = { name: '', singer: '', url: '', cover: '' };
+    this.data = { name: '', singer: '', url: '', cover: '', lyric: '' };
     Object.assign(this.data, data);
+    this.unsavedFileCount = 0;
   },
   create(data) {
     let song = new this.Song();
@@ -134,8 +140,8 @@ let controller = {
   init(view, model) {
     this.view = view;
     this.model = model;
-    this.view.init();
     this.model.init();
+    this.view.init(this.model.data);
     this.formType = 'new';
     this.bindEvents();
     this.bindEventHub();
