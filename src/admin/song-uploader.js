@@ -1,5 +1,6 @@
 import axios from 'axios';
 import eventHub from '../vendor/event-hub';
+import API from "../asserts/api";
 
 const STATE = {
   WAIT_SELECT: Symbol('select file'),
@@ -97,7 +98,7 @@ let model = {
     this.token = undefined;
     this.timer = undefined;
     this.axios = axios.create({
-      baseURL: 'http://localhost:39999/upload/',
+      baseURL: API.resouces.upload,
       timeout: 10000,
     });
     this.update();
@@ -198,7 +199,7 @@ let controller = {
         let result = JSON.parse(res.request.responseText).result;
         let fileData = [];
         for (const key in result.urls) { // 转化为真正的网页链接编码
-          fileData.push({name: key, url: encodeURI(result.urls[key]), cover: '', singer:''});
+          fileData.push({name: key, url: encodeURI(API.resouces.base + result.urls[key]), cover: '', singer:''});
         }
         eventHub.emit('admin-upload', fileData);
         this.view.updateByState(STATE.UPLOAD_SUCCESS);

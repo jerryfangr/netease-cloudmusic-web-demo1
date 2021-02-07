@@ -55,6 +55,7 @@ let view = {
       for (const key in song) {
         template = template.replace(`{{${key}}}`, song[key] || '');
       }
+      template = template.replace(`{{lyric}}`, song.lyric || '');
       html += template;
     });
 

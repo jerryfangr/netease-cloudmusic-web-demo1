@@ -34,8 +34,8 @@ module.exports = merge(commonConfig, {
     contentBase: "./dist",
     // 启动gzip压缩
     compress: true,
-    // host
-    //host: process.env.HOST,
+    // host 默认只能在本机打开，这里运行外网与局域网打开
+    host: '0.0.0.0',
     // 服务端口号
     port: 33333, //process.env.PORT
     // 编译完自动打开浏览器
