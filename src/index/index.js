@@ -1,6 +1,5 @@
 import './index.less';
 import '../asserts/ali-svg';
-// import { AV } from "../vendor/av";
 import tabs from './tabs'
 import pageOne from './page-one'
 import pageTwo from './page-two'

@@ -29,13 +29,13 @@ module.exports = merge(commonConfig, {
   // 热更新
   devServer: {
     // 多个输出，配置当前调试的页面，否则为根路径http://localhost:3333/
-    openPage: "index.html",
+    openPage: "admin.html",
     // 项目构建目录
     contentBase: "./dist",
     // 启动gzip压缩
     compress: true,
     // host 默认只能在本机打开，这里运行外网与局域网打开
-    host: '0.0.0.0',
+    // host: '0.0.0.0',
     // 服务端口号
     port: 33333, //process.env.PORT
     // 编译完自动打开浏览器

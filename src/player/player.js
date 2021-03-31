@@ -144,7 +144,7 @@ let controller = {
   },
   getSongId () {
     let search = window.location.search.indexOf('?') === -1 ? undefined : window.location.search.substring(1);
-    let param = search.split('&').filter(v => v); // filter会忽略falsy值的返回
+    let param = search.split('&').filter(v => v);
     for (let i = 0; i < param.length; i++) {
       let kv = param[i].split('=');
       if (kv[0] === 'id') {

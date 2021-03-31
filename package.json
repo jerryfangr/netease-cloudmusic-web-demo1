@@ -4,9 +4,8 @@
   "description": "163 music",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack serve --open --config webpack.dev.js",
-    "prod": "webpack --config webpack.prod.js",
+    "serve": "webpack serve --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
     "start": "npm run dev"
   },
   "keywords": [],
